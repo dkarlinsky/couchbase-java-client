@@ -77,7 +77,9 @@ public class BucketMonitor extends Observable {
    */
   public static final String CLIENT_SPEC_VER = "1.0";
 
-  /**
+  private long timeoutMs = 10000L;
+
+    /**
    * @param cometStreamURI the URI which will stream node changes
    * @param bucketname the bucketToMonitor name we are monitoring
    * @param username the username required for HTTP Basic Auth to the restful
@@ -178,7 +180,8 @@ public class BucketMonitor extends Observable {
   }
 
   public void startMonitor(long timeoutMs) {
-    if (channel != null) {
+      this.timeoutMs = timeoutMs;
+      if (channel != null) {
       Logger.getLogger(BucketMonitor.class.getName()).log(Level.WARNING,
           "Bucket monitor is already started.");
       return;
@@ -217,7 +220,7 @@ public class BucketMonitor extends Observable {
     HttpRequest request = prepareRequest(cometStreamURI, host);
     channel.write(request);
     try {
-      String response = this.handler.getLastResponse();
+      String response = this.handler.getLastResponse(timeoutMs);
       logFiner("Getting server list returns this last chunked response:\n"
           + response);
       Bucket bucketToMonitor = this.configParser.parseBucket(response);
@@ -228,7 +231,7 @@ public class BucketMonitor extends Observable {
         + "existing configuration.", ex);
       Logger.getLogger(BucketMonitor.class.getName()).log(Level.FINE,
         "Invalid client configuration received:\n{0}",
-        handler.getLastResponse());
+        handler.getLastResponse(timeoutMs));
     }
   }
 
@@ -330,7 +333,7 @@ public class BucketMonitor extends Observable {
    */
   protected void replaceConfig() {
     try {
-      String response = handler.getLastResponse();
+      String response = handler.getLastResponse(timeoutMs);
       Bucket updatedBucket = this.configParser.parseBucket(response);
       setBucket(updatedBucket);
     } catch (ParseException e) {

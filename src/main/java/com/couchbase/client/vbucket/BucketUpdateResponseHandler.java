@@ -122,9 +122,10 @@ public class BucketUpdateResponseHandler extends SimpleChannelUpstreamHandler {
 
   /**
    * @return the lastResponse
+   * @param timeoutMs
    */
-  protected String getLastResponse() {
-    ChannelFuture channelFuture = getReceivedFuture();
+  protected String getLastResponse(long timeoutMs) {
+    ChannelFuture channelFuture = getReceivedFuture(timeoutMs);
     if (channelFuture.awaitUninterruptibly(30, TimeUnit.SECONDS)) {
       return lastResponse;
     } else { // TODO: make this work with multiple servers
@@ -133,7 +134,7 @@ public class BucketUpdateResponseHandler extends SimpleChannelUpstreamHandler {
   }
 
   /**
-   * @param lastResponse the lastResponse to set
+   * @param newLastResponse the lastResponse to set
    */
   private void setLastResponse(String newLastResponse) {
     this.lastResponse = newLastResponse;
@@ -141,10 +142,12 @@ public class BucketUpdateResponseHandler extends SimpleChannelUpstreamHandler {
 
   /**
    * @return the receivedFuture
+   * @param timeoutMs
    */
-  private ChannelFuture getReceivedFuture() {
+  private ChannelFuture getReceivedFuture(long timeoutMs) {
     try {
-      getLatch().await();
+      if(!getLatch().await(timeoutMs, TimeUnit.MILLISECONDS))
+          finerLog("Getting received future has timed out.");
     } catch (InterruptedException ex) {
       finerLog("Getting received future has been interrupted.");
     }
@@ -152,7 +155,7 @@ public class BucketUpdateResponseHandler extends SimpleChannelUpstreamHandler {
   }
 
   /**
-   * @param receivedFuture the receivedFuture to set
+   * @param newReceivedFuture the receivedFuture to set
    */
   private void setReceivedFuture(ChannelFuture newReceivedFuture) {
     this.receivedFuture = newReceivedFuture;
