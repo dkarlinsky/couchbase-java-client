@@ -44,6 +44,8 @@ import net.spy.memcached.TestConfig;
 import net.spy.memcached.internal.OperationFuture;
 
 import org.junit.Ignore;
+
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assume.assumeTrue;
 
 /**

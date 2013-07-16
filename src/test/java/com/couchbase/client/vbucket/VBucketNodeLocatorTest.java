@@ -80,7 +80,12 @@ public class VBucketNodeLocatorTest extends TestCase {
       + "      [-1],\n" + "      [0],\n" + "      [0]\n"
       + "    ]\n" + "}" + "}";
 
-  /**
+    public VBucketNodeLocatorTest(String name)
+    {
+        super(name);
+    }
+
+    /**
    * Get primary memcached node for a given key.
    *
    * @pre Create three nodes and set their corresponding socket

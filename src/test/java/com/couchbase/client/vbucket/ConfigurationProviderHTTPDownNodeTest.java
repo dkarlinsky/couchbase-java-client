@@ -42,7 +42,12 @@ public class ConfigurationProviderHTTPDownNodeTest extends TestCase {
   private ConfigurationProviderHTTP configProvider;
   private static final String DEFAULT_BUCKET_NAME = "default";
 
-  @Override
+    public ConfigurationProviderHTTPDownNodeTest(String name)
+    {
+        super(name);
+    }
+
+    @Override
   protected void setUp() throws Exception {
     super.setUp();
     List<URI> baseList = new ArrayList<URI>();
