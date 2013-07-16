@@ -40,7 +40,12 @@ public class ClusterManagerTest extends TestCase {
 
   private ClusterManager manager;
 
-  /**
+    public ClusterManagerTest(String name)
+    {
+        super(name);
+    }
+
+    /**
    * This method is used to do the initial setUp of the cluster manager.
    * It creates a new instance using the server configuration stored in the
    * build.xml and the CbTestConfig class. The existing buckets are

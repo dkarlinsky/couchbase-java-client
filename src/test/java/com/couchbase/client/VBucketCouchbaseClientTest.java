@@ -39,7 +39,12 @@ import net.spy.memcached.TestConfig;
  */
 public class VBucketCouchbaseClientTest extends TestCase {
 
-  /**
+    public VBucketCouchbaseClientTest(String name)
+    {
+        super(name);
+    }
+
+    /**
    * Creates a vbucket aware couchbase client and test the basic
    * set get operations on the same.
    *

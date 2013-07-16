@@ -84,7 +84,12 @@ public class VBucketCacheNodeLocatorTest extends TestCase {
       + "\", "
       + "    \"uri\": \"/pools/default/buckets/default\"" + "}";
 
-  /**
+    public VBucketCacheNodeLocatorTest(String name)
+    {
+        super(name);
+    }
+
+    /**
    * Test get config and count of servers.
    *
    * @pre Using the configFactory, fetch the

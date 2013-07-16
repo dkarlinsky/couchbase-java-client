@@ -37,7 +37,12 @@ public class ConfigurationParserJSONTest extends TestCase {
   private ConfigurationParser configParser = new ConfigurationParserJSON();
   private static final String DEFAULT_POOL_NAME = "default";
 
-  /**
+    public ConfigurationParserJSONTest(String name)
+    {
+        super(name);
+    }
+
+    /**
    * Test to check if the base string used
    * can be parsed or not.
    *
