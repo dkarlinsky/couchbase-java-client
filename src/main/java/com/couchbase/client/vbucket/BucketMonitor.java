@@ -77,7 +77,9 @@ public class BucketMonitor extends Observable {
    */
   public static final String CLIENT_SPEC_VER = "1.0";
 
-  /**
+  private long timeoutMs = 10000L;
+
+    /**
    * @param cometStreamURI the URI which will stream node changes
    * @param bucketname the bucketToMonitor name we are monitoring
    * @param username the username required for HTTP Basic Auth to the restful
@@ -174,7 +176,12 @@ public class BucketMonitor extends Observable {
   }
 
   public void startMonitor() {
-    if (channel != null) {
+    startMonitor(Long.getLong("cbclient.bucket.monitor.timeout",10000L));
+  }
+
+  public void startMonitor(long timeoutMs) {
+      this.timeoutMs = timeoutMs;
+      if (channel != null) {
       Logger.getLogger(BucketMonitor.class.getName()).log(Level.WARNING,
           "Bucket monitor is already started.");
       return;
@@ -198,7 +205,11 @@ public class BucketMonitor extends Observable {
     });
 
     try {
-      channelLatch.await();
+
+        if(!channelLatch.await(timeoutMs, TimeUnit.MILLISECONDS))
+            throw new ConnectionException("Timed out while waiting for streaming "
+                    + "connection to arrive.");
+
     } catch(InterruptedException ex) {
       throw new ConnectionException("Interrupted while waiting for streaming "
         + "connection to arrive.");
@@ -209,7 +220,7 @@ public class BucketMonitor extends Observable {
     HttpRequest request = prepareRequest(cometStreamURI, host);
     channel.write(request);
     try {
-      String response = this.handler.getLastResponse();
+      String response = this.handler.getLastResponse(timeoutMs);
       logFiner("Getting server list returns this last chunked response:\n"
           + response);
       Bucket bucketToMonitor = this.configParser.parseBucket(response);
@@ -220,7 +231,7 @@ public class BucketMonitor extends Observable {
         + "existing configuration.", ex);
       Logger.getLogger(BucketMonitor.class.getName()).log(Level.FINE,
         "Invalid client configuration received:\n{0}",
-        handler.getLastResponse());
+        handler.getLastResponse(timeoutMs));
     }
   }
 
@@ -268,7 +279,7 @@ public class BucketMonitor extends Observable {
   /**
    * Update the config if it has changed and notify our observers.
    *
-   * @param bucketToMonitor the bucketToMonitor to set
+   * @param newBucket the bucketToMonitor to set
    */
   private void setBucket(Bucket newBucket) {
     if (this.bucket == null || !this.bucket.equals(newBucket)) {
@@ -322,7 +333,7 @@ public class BucketMonitor extends Observable {
    */
   protected void replaceConfig() {
     try {
-      String response = handler.getLastResponse();
+      String response = handler.getLastResponse(timeoutMs);
       Bucket updatedBucket = this.configParser.parseBucket(response);
       setBucket(updatedBucket);
     } catch (ParseException e) {
