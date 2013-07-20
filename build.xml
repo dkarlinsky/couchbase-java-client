@@ -37,7 +37,7 @@
 
   <property name="base.src.dir" value="${basedir}/src" />
   <property name="build.dir" value="${basedir}/build" />
-  <property name="build.src.dir" value="${build.dir}/src" />
+  <property name="build.src.dir" value="${basedir}/src" />
   <property name="etc.dir" value="${basedir}/etc" />
   <property name="lib.dir" value="${basedir}/lib" />
   <property name="src.dir" value="${base.src.dir}/main/java" />
@@ -49,6 +49,10 @@
 
   <property name="dist.dir" value="${basedir}/target" />
   <property name="build.classes" location="${build.dir}/classes"/>
+
+  <property name="artifactory.user" value="build"/>
+  <property name="artifactory.password" value="build"/>
+  <property name="artifactory.url" value="http://artifactory:8081/artifactory/libs-release-local"/>
 
   <property name="git.hash" value="" />
   <var name="version" value="no-version"/>
@@ -349,12 +353,12 @@
         <var name="version" value="${result}"/>
       </then>
     </if>
-    <exec executable="${script.src.dir}/write-version-info.sh"
-        dir="${basedir}" failonerror="true">
-      <arg value="${build.dir}" />
-      <arg value="${version}" />
-      <arg value="${git.hash}" />
-    </exec>
+    <!--<exec executable="${script.src.dir}/write-version-info.sh"-->
+        <!--dir="${basedir}" failonerror="true">-->
+      <!--<arg value="${build.dir}" />-->
+      <!--<arg value="${version}" />-->
+      <!--<arg value="${git.hash}" />-->
+    <!--</exec>-->
   </target>
 
   <target name="compile" depends="ivy-init, gen-version, ivy-retrieve"
@@ -386,7 +390,7 @@
         source="1.6">
       <classpath refid="${name}.common.classpath"/>
     </javac>
-    <move file="${build.src.dir}/com/couchbase/client/changelog.txt"
+    <move failonerror="false" file="${build.src.dir}/com/couchbase/client/changelog.txt"
         tofile="${build.classes}/com/couchbase/client/changelog.txt" />
   </target>
 
@@ -504,6 +508,24 @@
           classifier="sources" />
     </artifact:install>
   </target>
+
+
+   <target name="mvn-deploy" depends="jar,srcjar,package,mvn-prep"
+           description="deploy to artifactory">
+
+       <artifact:pom id="couchbase-client" file="${couchbase-client.pom}" />
+
+       <artifact:deploy file="${build.dir}/jars/${name}-${version}.jar">
+           <artifact:remoteRepository url="${artifactory.url}">
+               <artifact:authentication username="${artifactory.user}" password="${artifactory.password}"/>
+           </artifact:remoteRepository>
+           <artifact:pom refid="couchbase-client" />
+           <artifact:attach file="${build.dir}/sources/${name}-${version}.jar"
+                   classifier="sources" />
+           <artifact:attach file="${build.dir}/javadocs/${name}-${version}.jar"
+                   classifier="javadoc" />
+       </artifact:deploy>
+   </target>
 
   <!-- ======================================
         Section: Stage Maven locally

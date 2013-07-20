@@ -41,7 +41,12 @@ public class ConfigurationProviderHTTPTest extends TestCase {
   private ConfigurationProviderHTTP configProvider;
   private ReconfigurableMock reconfigurable = new ReconfigurableMock();
 
-  @Override
+    public ConfigurationProviderHTTPTest(String name)
+    {
+        super(name);
+    }
+
+    @Override
   protected void setUp() throws Exception {
     super.setUp();
     List<URI> baseList = Arrays.asList(new URI("http://"

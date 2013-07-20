@@ -42,7 +42,12 @@ public class BucketMonitorTest extends TestCase {
   private static final ConfigurationParserMock CONFIG_PARSER =
       new ConfigurationParserMock();
 
-  /**
+    public BucketMonitorTest(String name)
+    {
+        super(name);
+    }
+
+    /**
    * Tests instantiation of the BucketMonitor.
    *
    * @pre Prepare a new instance of BucketMonitor with

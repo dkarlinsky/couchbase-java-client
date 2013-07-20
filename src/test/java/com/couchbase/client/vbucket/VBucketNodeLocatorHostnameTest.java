@@ -64,7 +64,12 @@ public class VBucketNodeLocatorHostnameTest extends TestCase {
       + "      [1, 2, 0],\n" + "      [2, 1, -1],\n" + "      [1, 2, 0]\n"
       + "    ]\n" + "}" + "}";
 
-  /**
+    public VBucketNodeLocatorHostnameTest(String name)
+    {
+        super(name);
+    }
+
+    /**
    * Get primary memcached node for a given key.
    *
    * @pre  Create three nodes and set their corresponding
